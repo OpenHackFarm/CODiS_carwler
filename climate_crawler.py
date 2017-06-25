@@ -7,9 +7,10 @@ import requests
 import pandas as pd
 from time import sleep
 from bs4 import BeautifulSoup
+import csv
 
-PATH = '/home/yan/sync/project/Weather Station/CODiS/'
-
+#PATH = '/home/yan/sync/project/Weather Station/CODiS/'
+PATH = './data/'
 
 # 產生data List , data List為兩年份
 def date():
@@ -81,14 +82,26 @@ def crawler(url,name):
 
 if __name__ == "__main__":
     download = date()
+    hostUrl = "http://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?"
+    fixedParameter = "command=viewMain"
+    csvFile = open('TaiwanWeatherSatation.csv')
+
     for date in download:
         # 此為宜蘭站的觀測資料
-        url="http://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&station=467080&stname=%25E5%25AE%259C%25E8%2598%25AD&datepicker="+date
+        #url="http://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&station=467080&stname=%25E5%25AE%259C%25E8%2598%25AD&datepicker="+date
+    
         print(date)
         try:
-            crawler(url,date)
-            print url
+            for row in csv.DictReader(csvFile):
+                station = row['站號']
+                stname = row['站名']
+                url = hostUrl + fixedParameter + '&station=' + station + '&stname=' + stname + '&datepicker=' + date
+                crawler(url,date + '-' + stname)
+                print url
         except:
             # 若是爬取失敗把該日期寫入error.txt
             with open (PATH + "error.txt",'a') as f:
                 f.write(date+'\n')
+            csvFile.close()
+
+    csvFile.close()
