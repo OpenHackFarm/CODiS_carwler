@@ -8,8 +8,9 @@ import pandas as pd
 from time import sleep
 from bs4 import BeautifulSoup
 
-PATH = '/home/yan/sync/project/Weather Station/CODiS/'
-
+#PATH = '/home/yan/sync/project/Weather Station/CODiS/'
+PATH = input('Please enter the path to store the data. The input path should be\
+wrapped with double quotes')
 
 # 產生data List , data List為兩年份
 def date():
@@ -87,7 +88,7 @@ if __name__ == "__main__":
         print(date)
         try:
             crawler(url,date)
-            print url
+            print(url)
         except:
             # 若是爬取失敗把該日期寫入error.txt
             with open (PATH + "error.txt",'a') as f:
