@@ -8,11 +8,15 @@ import pandas as pd
 from time import sleep
 from bs4 import BeautifulSoup
 import csv
+import os
 
 #PATH = '/home/yan/sync/project/Weather Station/CODiS/'
 
 PATH = './data/'
 
+#To create the directory if it doesn't exist
+if not os.path.exists(PATH):
+    os.mkdir(PATH)
 
 # 產生data List , data List為兩年份
 def date():
@@ -27,9 +31,9 @@ def date():
     nday31 = map(str,nday31[9:])
     nday30 = map(str,nday30[9:])
     nday28 = map(str,nday28[9:])
-    day31 = day10 + nday31
-    day30 = day10 + nday30
-    day28 = day10 + nday28
+    day31 = day10 + list(nday31)
+    day30 = day10 + list(nday30)
+    day28 = day10 + list(nday28)
     output=[]
     s=""
     for year in year2:
