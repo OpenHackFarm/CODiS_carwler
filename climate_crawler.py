@@ -9,14 +9,8 @@ from time import sleep
 from bs4 import BeautifulSoup
 import csv
 import os
+import datetime
 
-#PATH = '/home/yan/sync/project/Weather Station/CODiS/'
-
-PATH = './data/'
-
-#To create the directory if it doesn't exist
-if not os.path.exists(PATH):
-    os.mkdir(PATH)
 
 # 產生data List , data List為兩年份
 def date():
@@ -54,7 +48,7 @@ def date():
 
 
 # 爬取主函式
-def crawler(url,name):
+def crawler(url, name, save_path):
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text)
 
@@ -82,29 +76,46 @@ def crawler(url,name):
         form.append(parameter)
 
     form = pd.DataFrame(form, columns=strtitle)
-    form.to_csv(PATH + name + ".txt", encoding ="utf-8")
+    form.to_csv(save_path + name + ".txt", encoding ="utf-8")
     sleep(0.5)
 
 
 if __name__ == "__main__":
-    download = date()
+    start = datetime.datetime.strptime("2017-01-01", "%Y-%m-%d")
+    end = datetime.datetime.strptime("2018-01-01", "%Y-%m-%d")
+    date_generated = [(start + datetime.timedelta(days=x)).strftime("%Y-%m-%d") for x in range(0, (end-start).days)]
+    download = date_generated
+    # download = date()
+
     hostUrl = "http://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?"
     fixedParameter = "command=viewMain"
-    csvFile = open('TaiwanWeatherSatation.csv')
 
-    for date in download:
-        # 此為宜蘭站的觀測資料
-        #url="http://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&station=467080&stname=%25E5%25AE%259C%25E8%2598%25AD&datepicker="+date
-    
-        print(date)
-        try:
-            crawler(url,date)
-            print(url)
+    with open('CWB_Stations_171226.csv', 'rb') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
 
-        except:
-            # 若是爬取失敗把該日期寫入error.txt
-            with open (PATH + "error.txt",'a') as f:
-                f.write(date+'\n')
-            csvFile.close()
+        firstline = True
+        for row in spamreader:
+	    if firstline:    #skip first line
+		firstline = False
+		continue
 
-    csvFile.close()
+            # print ', '.join(row)
+
+            station_id = row[0]
+            station_name = row[1]
+
+            save_path = './data/%s_%s/' % (station_id, station_name)
+
+            if not os.path.exists(save_path):
+                os.mkdir(save_path)
+
+            for date in download:
+                url = '%s%s&station=%s&stname=%s&datepicker=%s' % (hostUrl, fixedParameter, station_id, station_name, date)
+
+                try:
+                    print(url)
+                    crawler(url, date, save_path)
+                except:
+                    # 若是爬取失敗把該日期寫入error.txt
+                    with open(save_path + "error.txt", 'a') as f:
+                        f.write(date+'\n')
