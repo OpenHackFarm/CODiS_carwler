@@ -81,7 +81,7 @@ if __name__ == "__main__":
                 url = '%s&station=%s&stname=%s&datepicker=%s' % (hostUrl, station_id, station_name, month)
                 print(url)
 
-                save_dir_path = './data/%s_%s/' % (station_id, station_name)
+                save_dir_path = './CODiS-data/%s_%s/' % (station_id, station_name)
                 filename = '%s.json' % month
 
                 if (not os.path.exists(save_dir_path + filename)) or (OVER_WRITE is True):
