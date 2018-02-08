@@ -10,6 +10,8 @@ import csv
 import json
 import os
 
+OVER_WRITE = False
+
 
 def generate_query_month(year):
     month = []
@@ -82,7 +84,7 @@ if __name__ == "__main__":
                 save_dir_path = './data/%s_%s/' % (station_id, station_name)
                 filename = '%s.json' % month
 
-                if not os.path.exists(save_dir_path + filename):
+                if (not os.path.exists(save_dir_path + filename)) or (OVER_WRITE is True):
                     print save_dir_path + filename
                     try:
                         json_data = crawler(url)
