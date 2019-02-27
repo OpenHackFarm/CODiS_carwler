@@ -62,7 +62,10 @@ if __name__ == "__main__":
 
                     # for each month
                     for m in data.keys():
-                        month = m.split('-')[1]
+                        if len(m.split('-')) > 1:
+                            month = m.split('-')[1]
+                        else:
+                            month = m
                         for field in data_key:
                             if isfloat(data[m][field]):
                                 sum_data[month][field] = sum_data[month][field] + float(data[m][field])
